@@ -10,6 +10,7 @@
     using Microsoft.Bot.Builder.Luis;
     using Microsoft.Bot.Builder.Luis.Models;
     using Microsoft.Bot.Connector;
+  
 
     [LuisModel("87001b9b-2bb7-461f-af7e-3dc08032f9e4", "9660d9c0c855475eace4e50e5e69d61c")]
     [Serializable]
@@ -21,7 +22,14 @@
 
         private const string EntityAirportCode = "AirportCode";
 
-        private IList<string> titleOptions = new List<string> { "“Very stylish, great stay, great staff”", "“good hotel awful meals”", "“Need more attention to little things”", "“Lovely small hotel ideally situated to explore the area.”", "“Positive surprise”", "“Beautiful suite and resort”" };
+        private const string EntityClinicalTrail = "Clinical trail";
+
+        private const string EntityCancer = "Cancer";
+
+        private const string EntityTest = "Test";
+        
+        private IList<string> titleOptions = new List<string> { "“EGFR”", "“JAK2”", "“KRAS”", "“BRAF”", "“NRAS”", "“Tumor percent”" };
+
 
         [LuisIntent("")]
         [LuisIntent("None")]
@@ -34,65 +42,119 @@
             context.Wait(this.MessageReceived);
         }
 
-        [LuisIntent("SearchHotels")]
-        public async Task Search(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
+        [LuisIntent("Checklist")]
+        public async Task Checklist(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
         {
-            var message = await activity;
-            await context.PostAsync($"Welcome to the Hotels finder! We are analyzing your message: '{message.Text}'...");
+            await context.PostAsync("These are the tasks for visit 2");
+            await context.PostAsync("Take vitals and temperature");
+            await context.PostAsync("Grade the disease");
+            await context.PostAsync("Etc...");
 
-            var hotelsQuery = new HotelsQuery();
+            context.Wait(this.MessageReceived);
 
-            EntityRecommendation cityEntityRecommendation;
+            //var message = await activity;
+            //await context.PostAsync($"Welcome! We are analyzing your message: '{message.Text}'...");
 
-            if (result.TryFindEntity(EntityGeographyCity, out cityEntityRecommendation))
-            {
-                cityEntityRecommendation.Type = "Destination";
-            }
+            //var hotelsQuery = new HotelsQuery();
 
-            var hotelsFormDialog = new FormDialog<HotelsQuery>(hotelsQuery, this.BuildHotelsForm, FormOptions.PromptInStart, result.Entities);
+            //EntityRecommendation cityEntityRecommendation;
 
-            context.Call(hotelsFormDialog, this.ResumeAfterHotelsFormDialog);
+            //if (result.TryFindEntity(EntityGeographyCity, out cityEntityRecommendation))
+            //{
+            //    cityEntityRecommendation.Type = "Destination";
+            //}
+
+            //var hotelsFormDialog = new FormDialog<HotelsQuery>(hotelsQuery, this.BuildHotelsForm, FormOptions.PromptInStart, result.Entities);
+
+            //context.Call(hotelsFormDialog, this.ResumeAfterHotelsFormDialog);
         }
 
-        [LuisIntent("ShowHotelsReviews")]
-        public async Task Reviews(IDialogContext context, LuisResult result)
+        [LuisIntent("Trial")]
+        public async Task Trial(IDialogContext context, LuisResult result)
         {
-            EntityRecommendation hotelEntityRecommendation;
+            await context.PostAsync("The trial end points are...");
+            await context.PostAsync("Disease free survival");
+            await context.PostAsync("Decrease in tumor percent");
+            await context.PostAsync("Normal function of body vitals");
 
-            if (result.TryFindEntity(EntityHotelName, out hotelEntityRecommendation))
-            {
-                await context.PostAsync($"Looking for reviews of '{hotelEntityRecommendation.Entity}'...");
+            context.Wait(this.MessageReceived);
 
-                var resultMessage = context.MakeMessage();
-                resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                resultMessage.Attachments = new List<Attachment>();
+            //EntityRecommendation hotelEntityRecommendation;
 
-                for (int i = 0; i < 5; i++)
-                {
-                    var random = new Random(i);
-                    ThumbnailCard thumbnailCard = new ThumbnailCard()
-                    {
-                        Title = this.titleOptions[random.Next(0, this.titleOptions.Count - 1)],
-                        Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris odio magna, sodales vel ligula sit amet, vulputate vehicula velit. Nulla quis consectetur neque, sed commodo metus.",
-                        Images = new List<CardImage>()
-                        {
-                            new CardImage() { Url = "https://upload.wikimedia.org/wikipedia/en/e/ee/Unknown-person.gif" }
-                        },
-                    };
+            //if (result.TryFindEntity(EntityHotelName, out hotelEntityRecommendation))
+            //{
+            //    await context.PostAsync($"Looking for reviews of '{hotelEntityRecommendation.Entity}'...");
 
-                    resultMessage.Attachments.Add(thumbnailCard.ToAttachment());
-                }
+            //    var resultMessage = context.MakeMessage();
+            //    resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+            //    resultMessage.Attachments = new List<Attachment>();
 
-                await context.PostAsync(resultMessage);
-            }
+            //    for (int i = 0; i < 5; i++)
+            //    {
+            //        var random = new Random(i);
+            //        ThumbnailCard thumbnailCard = new ThumbnailCard()
+            //        {
+            //            Title = this.titleOptions[random.Next(0, this.titleOptions.Count - 1)],
+            //            Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris odio magna, sodales vel ligula sit amet, vulputate vehicula velit. Nulla quis consectetur neque, sed commodo metus.",
+            //            Images = new List<CardImage>()
+            //            {
+            //                new CardImage() { Url = "https://upload.wikimedia.org/wikipedia/en/e/ee/Unknown-person.gif" }
+            //            },
+            //        };
+
+            //        resultMessage.Attachments.Add(thumbnailCard.ToAttachment());
+            //    }
+
+            //    await context.PostAsync(resultMessage);
+            //}
+
+            //context.Wait(this.MessageReceived);
+        }
+        [LuisIntent("Gleasonscore")]
+        public async Task Gleasonscore(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync("A system of grading prostate cancer tissue based on how it looks under a microscope. Gleason scores range from 2 to 10 and indicate how likely it is that a tumor will spread. A low Gleason score means the cancer tissue is similar to normal prostate tissue and the tumor is less likely to spread; a high Gleason score means the cancer tissue is very different from normal and the tumor is more likely to spread.");
 
             context.Wait(this.MessageReceived);
         }
 
+        [LuisIntent("EGFR")]
+        public async Task EGFR(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync("The estimated glomerular filtration rate (eGFR) is used to screen for and detect early kidney damage, to help diagnose chronic kidney disease (CKD), and to monitor kidney status");
+
+            context.Wait(this.MessageReceived);
+        }
+
+        [LuisIntent("Mammaprint")]
+        public async Task Mammaprint(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync("MammaPrint test is a genomic test that analyzes the activity of certain genes in early-stage breast cancer. Research suggests the MammaPrint test may eventually be widely used to help make treatment decisions based on the cancer's risk of coming back (recurrence) within 10 years after diagnosis.");
+
+            context.Wait(this.MessageReceived);
+        }
+
+        [LuisIntent("Cancerstaging")]
+        public async Task Cancerstaging(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync("Cancer staging is the process of determining how much cancer is in the body and where it is located. Staging describes the severity of an individual's cancer based on the magnitude of the original (primary) tumor as well as on the extent cancer has spread in the body.");
+
+            context.Wait(this.MessageReceived);
+        }
+
+        [LuisIntent("ReportedOutcome")]
+        public async Task ReportedOutcome(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync("It is SF 36");
+
+            context.Wait(this.MessageReceived);
+        }
+
+
         [LuisIntent("Help")]
         public async Task Help(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync("Hi! Try asking me things like 'search hotels in Seattle', 'search hotels near LAX airport' or 'show me the reviews of The Bot Resort'");
+            await context.PostAsync("Hi! Try asking me things like 'what are the trail end points', 'checklist for visit 2',  'what is the term gleason score mean', 'Cancer staging according to NCI', 'What are the patient reported outcomes for visit 2'");
 
             context.Wait(this.MessageReceived);
         }
